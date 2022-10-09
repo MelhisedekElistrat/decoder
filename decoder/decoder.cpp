@@ -1,78 +1,215 @@
-#include <iostream>
+п»ї#include <iostream>
 #include <string>
+#include <fstream>
 #include "decoder.h"
 
 int main()
 {
-    //русский язык
+    //СЂСѓСЃСЃРєРёР№ СЏР·С‹Рє
     setlocale(LC_ALL, "rus");
 
-    //Просьба ввести строки
-    std::cout << "Введите число строк: ";
-    int numbOfStrings;
-    std::cin >> numbOfStrings;
+    //РЎРѕР·РґР°РµРј С€С‚СѓРєСѓ РґР»СЏ РїРѕС‚РѕРєРѕРІС‹С… РґР°РЅРЅС‹С…
+    std::ifstream fin;
 
-    //Удаление символа ввода
-    std::cin.ignore(32767, '\n');
+    //РўСѓС‚ Р±СѓРґСѓС‚ С…СЂР°РЅРёС‚СЊСЃСЏ СЃС‚СЂРѕРєРё
+    std::vector<std::string> arrayStrings;
 
-    //Объявляется вектор строк
-    std::vector<std::string> arrayStrings(numbOfStrings);
-
-    //Просьба ввести строки
-    std::cout << "Введите строки: " << std::endl;
-
-    //Непосредственный ввод строк
-    for (int i = 0; i < numbOfStrings; i++)
+    try
     {
-        std::getline(std::cin, arrayStrings[i]);
+        //РћС‚РєСЂС‹РІР°РµРј С„Р°Р№РµР»
+        fin.open("decoderInputData.txt");
+    }
+    catch (const std::exception& ex)
+    {
+        std::cout << ex.what() << std::endl;
+        std::cout << "РћС€РёР±РєР° РѕС‚РєСЂС‹С‚РёСЏ С„Р°Р№Р»Р°!" << std::endl;
+        exit(1);
     }
 
-    //вызывается функция, декодирующая строки
-    for (int i = 0; i < numbOfStrings; i++)
-        decodingStrings(arrayStrings[i]);
+    //Р Р°Р·РјРµСЂ РІРµРєС‚РѕСЂР° 
+    int sizeOfVect = 1;
 
-    //выводится полученный результат
-    std::cout << std::endl;
-    for (int i = 0; i < numbOfStrings; i++)
+    //Р§РёСЃР»Рѕ СЃС‚СЂРѕРє СЂР°РІРЅРѕ РЅСѓР»СЋ, РїРѕС‚РѕРј РІ С†РёРєР»Рµ РїРѕР»СѓС‡РёС‚СЃСЏ СЏРІРЅРѕРµ С‡РёСЃР»Рѕ
+    int numbOfStrings = 0;
+
+    int i = 0; //С…Р· РЅР°РґРѕ Р»Рё РѕРЅРѕ
+
+    int activePointForCycle = 0;
+    //Р•СЃР»Рё СЃС‚СЂРѕРєРё РІ С„Р°Р№Р»Рµ РµС‰Рµ РµСЃС‚СЊ
+    while (!fin.eof())
     {
-        std::cout << arrayStrings[i] << std::endl;
+        if (i != 0 && activePointForCycle == 0)
+        {
+            //РЈРІРµР»РёС‡РёРІР°РµС‚СЃСЏ С‡РёСЃР»Рѕ СЃС‚СЂРѕРє
+            numbOfStrings++;
+
+            //РћС‚РґРµР»СЊРЅРѕ СѓРІРµР»РёС‡РёРІР°РµС‚СЃСЏ СЂР°Р·РјРµСЂ РІРµРєС‚РѕСЂР°
+            sizeOfVect++;
+        }
+
+        //РР·РјРµРЅСЏРµС‚СЃСЏ СЂР°Р·РјРµСЂ РІРµРєС‚РѕСЂР° РґРѕ 1
+        arrayStrings.resize(sizeOfVect);
+
+        //РР·РІР»РµРєР°РµС‚СЃСЏ СЃС‚СЂРѕРєР° РёР· С„Р°Р№Р»Р°
+        std::getline(fin, arrayStrings[numbOfStrings]);
+
+        //РџСЂРѕРІРµСЂРєР° РЅР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚СЊ СЃС‚СЂРѕРє (РЅРµ РїСѓСЃС‚Р°СЏ СЃС‚СЂРѕРєР°)
+        if (arrayStrings[numbOfStrings] == "")
+        {
+            //РЈР±РёСЂР°РµРј СЃС‚СЂРѕРєСѓ
+
+            /*sizeOfVect--;
+
+            numbOfStrings--;*/
+            activePointForCycle++;
+            //РРґРµРј РЅР° РЅРѕРІСѓСЋ РёС‚РµСЂР°С†РёСЋ
+            continue;
+        }
+
+        //Р•СЃР»Рё СЃРёРјРІРѕР»РѕРІ РјРµРЅСЊС€Рµ С‚СЂРµС… (2 СЃРёРјРІРѕР»Р° РґРѕР»Р¶РЅС‹ РѕСЃС‚Р°С‚СЊСЃСЏ, С‚СЂРµС‚РёР№ РїРѕС‚РѕРј СѓРґР°Р»РёС‚СЃСЏ)
+        if (arrayStrings[numbOfStrings].size() < 3)
+        {
+            std::cout << "РљРѕР»РёС‡РµСЃС‚РІРѕ СЃРёРјРІРѕР»РѕРІ РјРµРЅСЊС€Рµ РјРёРЅРёРјР°Р»СЊРЅРѕРіРѕ!" << std::endl;
+            exit(4);
+        }
+
+        //Р Р°Р·РјРµСЂ СЃС‚СЂРѕРє РЅРµ РјРµРЅСЊС€Рµ 100
+        if (arrayStrings[numbOfStrings].size() > 100)
+        {
+            std::cout << "РЎР»РёС€РєРѕРј РјРЅРѕРіРѕ СЃРёРјРІРѕР»РѕРІ РІ СЃС‚СЂРѕРєРµ! \nРњР°РєСЃРёРјР°Р»СЊРЅРѕРµ С‡РёСЃР»Рѕ СЃРёРјРІРѕР»РѕРІ РІ СЃС‚СЂРѕРєРµ - 100! " << std::endl;
+            exit(5);
+        }
+
+        i++;
+
+        if (activePointForCycle != 0)
+            activePointForCycle = 0;
+
     }
 
+    //РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ С‡РёСЃР»Рѕ СЃС‚СЂРѕРє - 100
+    if (sizeOfVect > 100)
+    {
+        std::cout << "РЎР»РёС€РєРѕРј РјРЅРѕРіРѕ СЃС‚СЂРѕРє! \nРњР°РєСЃРёРјР°Р»СЊРЅРѕРµ С‡РёСЃР»Рѕ СЃС‚СЂРѕРє - 100! " << std::endl;
+        exit(6);
+    }
+
+    //Р•СЃР»Рё С„Р°Р№Р» РїСѓСЃС‚РѕР№, С‚Рѕ РїСЂРѕРіСЂР°РјРјР° РІС‹Р»РµС‚Р°РµС‚ СЃ РѕС€РёР±РєРѕР№
+    if (sizeOfVect == 0)
+    {
+        std::cout << "Р¤Р°Р№Р» РїСѓСЃС‚!" << std::endl;
+        exit(3);
+    }
+
+    //bool pointError;
+
+    ////Р’С‹Р·С‹РІР°РµС‚СЃСЏ С„СѓРЅРєС†РёСЏ, РґРµРєРѕРґРёСЂСѓСЋС‰Р°СЏ СЃС‚СЂРѕРєРё
+    //for (int i = 0; i < numbOfStrings; i++)
+    //{
+    //    pointError = decodingStrings(arrayStrings[i]);
+
+    //    if (!pointError)
+    //    //Р—Р°РІРµСЂС€РёС‚СЊ РІС‹РїРѕР»РЅРµРЅРёРµ РїСЂРѕРіСЂР°РјРјС‹, РµСЃР»Рё РїРѕСЃР»РµРґРЅРёР№ СЃРёРјРІРѕР» СЃС‚СЂРѕРєРё РЅРµРІРµСЂРµРЅ 
+    //        exit(15);
+    //}
+
+    if (arrayStrings[numbOfStrings] == "")
+    {
+        arrayStrings.resize(sizeOfVect - 1);
+        sizeOfVect--;
+        numbOfStrings--;
+    }
+
+    decodingAllStrings(arrayStrings);
+
+    //Р’С‹Р·С‹РІР°РµС‚СЃСЏ РѕР±СЉРµРєС‚ ofstream РґР»СЏ РїРµСЂРµР·Р°РїРёСЃРё РґР°РЅРЅС‹С… РІ С„Р°Р№Р» 
+    std::ofstream fout;
+
+    try
+    {
+        //РћС‚РєСЂС‹РІР°РµРј С„Р°Р№РµР»
+        fout.open("decoderInputData.txt");
+    }
+    catch (const std::exception& ex)
+    {
+        std::cout << ex.what() << std::endl;
+        std::cout << "РћС€РёР±РєР° РѕС‚РєСЂС‹С‚РёСЏ С„Р°Р№Р»Р°!" << std::endl;
+        exit(1);
+    }
+
+    //РҐР· РєР°Рє СЂР°Р±РѕС‚Р°РµС‚ РїРѕРєР° С‡С‚Рѕ 20:49
+    //РўРµРїРµСЂСЊ РїРѕРЅСЏР» 20:53
+    fout.clear();
+
+    //РћС‚РїСЂР°РІР»СЏРµРј РїРѕР»СѓС‡РµРЅРЅС‹Рµ СЂРµР·СѓР»СЊС‚Р°С‚С‹ РІ С„Р°Р№Р».
+    for (int i = 0; i < sizeOfVect; i++)
+    {
+        fout << arrayStrings[i] << "\n";
+    }
+
+    fin.close();
+    fout.close();
 }
 
-void decodingStrings(std::string& arrayStrings)
+void decodingAllStrings(std::vector<std::string>& arrayStrings)
 {
-    //Определить число символов в группе
+    bool pointError;
+
+    //Р’С‹Р·С‹РІР°РµС‚СЃСЏ С„СѓРЅРєС†РёСЏ, РґРµРєРѕРґРёСЂСѓСЋС‰Р°СЏ СЃС‚СЂРѕРєРё
+    for (int i = 0; i < arrayStrings.size(); i++)
+    {
+        pointError = decodingStrings(arrayStrings[i]);
+
+        if (!pointError)
+            //Р—Р°РІРµСЂС€РёС‚СЊ РІС‹РїРѕР»РЅРµРЅРёРµ РїСЂРѕРіСЂР°РјРјС‹, РµСЃР»Рё РїРѕСЃР»РµРґРЅРёР№ СЃРёРјРІРѕР» СЃС‚СЂРѕРєРё РЅРµРІРµСЂРµРЅ 
+            exit(15);
+    }
+}
+
+
+bool decodingStrings(std::string& arrayStrings)
+{
+    //РћРїСЂРµРґРµР»РёС‚СЊ С‡РёСЃР»Рѕ СЃРёРјРІРѕР»РѕРІ РІ РіСЂСѓРїРїРµ
     int numbSymbolsInGroup = numbSymbolsGroups(arrayStrings);
 
-    //Удалить последний символ из строки
+    //Р•СЃР»Рё СЃС‚СЂРѕРєР° РЅРµ Р·Р°РєР°РЅС‡РёРІР°РµС‚СЃСЏ РїСЂРѕРїРёСЃРЅРѕР№ РёР»Рё СЃС‚СЂРѕС‡РЅРѕР№ Р±СѓРєРІРѕР№ Р»Р°С‚РёРЅСЃРєРѕРіРѕ Р°Р»С„Р°РІРёС‚Р°, С‚Рѕ РѕС€РёР±РєР°
+    if (numbSymbolsInGroup == 3456)
+    {
+        std::cout << "РћС€РёР±РєР°, СЃС‚СЂРѕРєР°(-Рё) РЅРµ Р·Р°РєР°РЅС‡РёРІР°РµС‚СЃСЏ(-СЋС‚СЃСЏ) РЅСѓР¶РЅС‹Рј СЃРёРјРІРѕР»РѕРј!" << std::endl;
+        return false;
+    }
+
+    //РЈРґР°Р»РёС‚СЊ РїРѕСЃР»РµРґРЅРёР№ СЃРёРјРІРѕР» РёР· СЃС‚СЂРѕРєРё
     arrayStrings.erase(arrayStrings.size() - 1, 1);
 
-    // Определяет число групп
+    // РћРїСЂРµРґРµР»СЏРµС‚ С‡РёСЃР»Рѕ РіСЂСѓРїРї
     int numbGroups = arrayStrings.size() / numbSymbolsInGroup;
-    // Если есть остаток от деления, значит конечное число нужно округлить в большую сторону 
+    // Р•СЃР»Рё РµСЃС‚СЊ РѕСЃС‚Р°С‚РѕРє РѕС‚ РґРµР»РµРЅРёСЏ, Р·РЅР°С‡РёС‚ РєРѕРЅРµС‡РЅРѕРµ С‡РёСЃР»Рѕ РЅСѓР¶РЅРѕ РѕРєСЂСѓРіР»РёС‚СЊ РІ Р±РѕР»СЊС€СѓСЋ СЃС‚РѕСЂРѕРЅСѓ 
     if (arrayStrings.size() % numbSymbolsInGroup != 0)
         numbGroups += 1;
 
-    //Функция, принимающая строку и разбивающая в массив строк по группам и вовзаращющая в текущий двумерный массив строк
+    //Р¤СѓРЅРєС†РёСЏ, РїСЂРёРЅРёРјР°СЋС‰Р°СЏ СЃС‚СЂРѕРєСѓ Рё СЂР°Р·Р±РёРІР°СЋС‰Р°СЏ РІ РјР°СЃСЃРёРІ СЃС‚СЂРѕРє РїРѕ РіСЂСѓРїРїР°Рј Рё РІРѕРІР·Р°СЂР°С‰СЋС‰Р°СЏ РІ С‚РµРєСѓС‰РёР№ РґРІСѓРјРµСЂРЅС‹Р№ РјР°СЃСЃРёРІ СЃС‚СЂРѕРє
     std::vector<std::string> groupsOfStrings = writeGroupsToArrayStrings(arrayStrings, numbSymbolsInGroup, numbGroups);
 
-    std::string endString = writeReverseGroups(groupsOfStrings, numbGroups);
+    std::string endString = writeReverseGroups(groupsOfStrings);
 
-    //сначала очистить массив от лишнего говна
+    //СЃРЅР°С‡Р°Р»Р° РѕС‡РёСЃС‚РёС‚СЊ РјР°СЃСЃРёРІ РѕС‚ Р»РёС€РЅРµРіРѕ РіРѕРІРЅР°
     arrayStrings.clear();
     //arrayStrings = arrayStrings.replace(0, arrayStrings.size() - 1, endString);
     arrayStrings = endString;
+
+    return true;
 }
 
 int numbSymbolsGroups(std::string& stringForDetermNumbGroups)
 {
-    //Определяет размер строки
+    //РћРїСЂРµРґРµР»СЏРµС‚ СЂР°Р·РјРµСЂ СЃС‚СЂРѕРєРё
     int lenOfString = stringForDetermNumbGroups.size();
 
-    //Определяет символ, определяющий число символов в одной группе
+    //РћРїСЂРµРґРµР»СЏРµС‚ СЃРёРјРІРѕР», РѕРїСЂРµРґРµР»СЏСЋС‰РёР№ С‡РёСЃР»Рѕ СЃРёРјРІРѕР»РѕРІ РІ РѕРґРЅРѕР№ РіСЂСѓРїРїРµ
     char lastSymb = stringForDetermNumbGroups[lenOfString - 1];
-    //Проверяет, если последний символ - прописной, то сделать ее строчной 
+
+    //РџСЂРѕРІРµСЂСЏРµС‚, РµСЃР»Рё РїРѕСЃР»РµРґРЅРёР№ СЃРёРјРІРѕР» - РїСЂРѕРїРёСЃРЅРѕР№, С‚Рѕ СЃРґРµР»Р°С‚СЊ РµРµ СЃС‚СЂРѕС‡РЅРѕР№ 
     if (lastSymb >= 65 && lastSymb <= 90) {
         lastSymb += 32;
     }
@@ -167,13 +304,13 @@ int numbSymbolsGroups(std::string& stringForDetermNumbGroups)
     return numbSymbInGroups;
 }
 
-//ПРОВЕРИТЬ ЭТУ ФУНКЦИЮ В for
+//РџР РћР’Р•Р РРўР¬ Р­РўРЈ Р¤РЈРќРљР¦РР® Р’ for
 std::vector<std::string> writeGroupsToArrayStrings(std::string& stringForReverseGroups, int numbSymbolsInGroup, int numbGroups)
 {
-    // Объявить массив строк
+    // РћР±СЉСЏРІРёС‚СЊ РјР°СЃСЃРёРІ СЃС‚СЂРѕРє
     std::vector<std::string> arrayOfStringsForReverse(numbGroups);
 
-    //Заполнить массив строк группами исходной строки
+    //Р—Р°РїРѕР»РЅРёС‚СЊ РјР°СЃСЃРёРІ СЃС‚СЂРѕРє РіСЂСѓРїРїР°РјРё РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРё
     for (int i = 0, j = 0; i < stringForReverseGroups.size(); i += numbSymbolsInGroup, j++)
     {
         arrayOfStringsForReverse.at(j) = stringForReverseGroups.substr(i, numbSymbolsInGroup);
@@ -182,20 +319,21 @@ std::vector<std::string> writeGroupsToArrayStrings(std::string& stringForReverse
     return arrayOfStringsForReverse;
 }
 
-std::string writeReverseGroups(std::vector<std::string>& groupsOfStrings, int numbGroups)
+std::string writeReverseGroups(std::vector<std::string>& groupsOfStrings)
 {
-    //Объявляем вектор, в который запишем обратные строки
+    int numbGroups = groupsOfStrings.size();
+    //РћР±СЉСЏРІР»СЏРµРј РІРµРєС‚РѕСЂ, РІ РєРѕС‚РѕСЂС‹Р№ Р·Р°РїРёС€РµРј РѕР±СЂР°С‚РЅС‹Рµ СЃС‚СЂРѕРєРё
     std::vector<std::string> reversedStrings(numbGroups);
 
-    //Присводить каждой строке нового вектора строку старого вектора с конца.
-    // (Берем numbGroups - 1, чтобы обратиться правильно по индексу и вычитаем число i
+    //РџСЂРёСЃРІРѕРґРёС‚СЊ РєР°Р¶РґРѕР№ СЃС‚СЂРѕРєРµ РЅРѕРІРѕРіРѕ РІРµРєС‚РѕСЂР° СЃС‚СЂРѕРєСѓ СЃС‚Р°СЂРѕРіРѕ РІРµРєС‚РѕСЂР° СЃ РєРѕРЅС†Р°.
+    // (Р‘РµСЂРµРј numbGroups - 1, С‡С‚РѕР±С‹ РѕР±СЂР°С‚РёС‚СЊСЃСЏ РїСЂР°РІРёР»СЊРЅРѕ РїРѕ РёРЅРґРµРєСЃСѓ Рё РІС‹С‡РёС‚Р°РµРј С‡РёСЃР»Рѕ i
     for (int i = 0; i < numbGroups; i++)
         reversedStrings[i] = groupsOfStrings[numbGroups - 1 - i];
 
-    //Объявляем строку, которая будет иметь конечный вид строки
+    //РћР±СЉСЏРІР»СЏРµРј СЃС‚СЂРѕРєСѓ, РєРѕС‚РѕСЂР°СЏ Р±СѓРґРµС‚ РёРјРµС‚СЊ РєРѕРЅРµС‡РЅС‹Р№ РІРёРґ СЃС‚СЂРѕРєРё
     std::string endString;
 
-    // Каждую группу конкатанируем к строке
+    // РљР°Р¶РґСѓСЋ РіСЂСѓРїРїСѓ РєРѕРЅРєР°С‚Р°РЅРёСЂСѓРµРј Рє СЃС‚СЂРѕРєРµ
     for (int i = 0; i < numbGroups; i++)
     {
         if (i == 0)
@@ -207,6 +345,6 @@ std::string writeReverseGroups(std::vector<std::string>& groupsOfStrings, int nu
         endString += reversedStrings[i];
     }
 
-    //Вернем строку
+    //Р’РµСЂРЅРµРј СЃС‚СЂРѕРєСѓ
     return endString;
 }

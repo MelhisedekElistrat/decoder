@@ -42,7 +42,6 @@ int main()
         exit(1);
     }
 
-   
     //Отключаем генерацию всех исключений
     fin.exceptions(std::ifstream::goodbit);
 
@@ -52,10 +51,25 @@ int main()
     //Число строк равно нулю, потом в цикле получится явное число
     int numbOfStrings = 0;
 
-  
+    //Если не равна нулю, то можно будет переходить на другую строку
+    int moveToNextString = 0;
+
+    //Если точка равна 0,  то можно будет переходить на другую строку
+    int activePointForCycle = 0;
+
     //Если строки в файле еще есть
     while (!fin.eof())
     {
+        //
+        if (moveToNextString != 0 && activePointForCycle == 0)
+        {
+            //Увеличивается число строк
+            numbOfStrings++;
+
+            //Отдельно увеличивается размер вектора
+            sizeOfVect++;
+        }
+
         //Изменяется размер вектора до 1
         arrayStrings.resize(sizeOfVect);
 
@@ -66,6 +80,9 @@ int main()
         //Проверка на корректность строк (не пустая строка)
         if (arrayStrings[numbOfStrings] == "")
         {
+            //Делаем данный флаг 1, чтобы при заходе на следующую итерацию
+            activePointForCycle++;
+
             //Идем на новую итерацию
             continue;
         }
@@ -84,6 +101,12 @@ int main()
             exit(5);
         }
 
+        //Если все соответствует условиям, переходим на другую строку
+        moveToNextString++;
+
+        //Если строка извлеклась корректно, то обнуляем переменную, чтобы перейти на следующую строку
+        if (activePointForCycle != 0)
+            activePointForCycle = 0;
     }
 
     //Максимальное число строк - 100

@@ -5,346 +5,449 @@
 
 int main()
 {
-    //русский язык
-    setlocale(LC_ALL, "rus");
+	//русский язык
+	setlocale(LC_ALL, "rus");
 
-    //Создаем штуку для потоковых данных
-    std::ifstream fin;
+	//Создаем штуку для потоковых данных
+	std::ifstream fin;
 
-    //Тут будут храниться строки
-    std::vector<std::string> arrayStrings;
+	//нужно вроде, чтобы выводилась ошибка открытия файла
+	fin.exceptions(std::istream::badbit | std::ifstream::failbit);
 
-    try
-    {
-        //Открываем файел
-        fin.open("decoderInputData.txt");
-    }
-    catch (const std::exception& ex)
-    {
-        std::cout << ex.what() << std::endl;
-        std::cout << "Ошибка открытия файла!" << std::endl;
-        exit(1);
-    }
+	//Вызывается объект ofstream для записи данных в файл
+	std::ofstream fout;
 
-    //Размер вектора 
-    int sizeOfVect = 1;
+	//Тут будут храниться строки
+	std::vector<std::string> arrayStrings;
 
-    //Число строк равно нулю, потом в цикле получится явное число
-    int numbOfStrings = 0;
+	std::string nameFileInput = "input.txt";
+	std::string nameFileOutput = "output.txt";
 
-    int i = 0; //хз надо ли оно
+	try
+	{
+		//Открываем файел
+		fin.open(nameFileInput);
+	}
+	catch (const std::exception& ex)
+	{
+		std::cout << ex.what() << std::endl;
 
-    int activePointForCycle = 0;
-    //Если строки в файле еще есть
-    while (!fin.eof())
-    {
-        if (i != 0 && activePointForCycle == 0)
-        {
-            //Увеличивается число строк
-            numbOfStrings++;
+		if (nameFileInput.find(".txt") == std::string::npos)
+		{
+			std::cout << "Неверно указано расширение файла. Файл должен иметь расширение .txt" << std::endl;
+			exit(1);
+		}
+		std::cout << "Неверно указан файл с входными данными. Возможно, файл не существует" << std::endl;
+		exit(1);
+	}
 
-            //Отдельно увеличивается размер вектора
-            sizeOfVect++;
-        }
+	fin.exceptions(std::ifstream::goodbit);
 
-        //Изменяется размер вектора до 1
-        arrayStrings.resize(sizeOfVect);
+	//Размер вектора
+	int sizeOfVect = 1;
 
-        //Извлекается строка из файла
-        std::getline(fin, arrayStrings[numbOfStrings]);
+	//Число строк равно нулю, потом в цикле получится явное число
+	int numbOfStrings = 0;
 
-        //Проверка на корректность строк (не пустая строка)
-        if (arrayStrings[numbOfStrings] == "")
-        {
-            //Убираем строку
+	int i = 0; //хз надо ли оно
 
-            /*sizeOfVect--;
+	int activePointForCycle = 0;
+	//Если строки в файле еще есть
+	while (!fin.eof())
+	{
+		if (i != 0 && activePointForCycle == 0)
+		{
+			//Увеличивается число строк
+			numbOfStrings++;
 
-            numbOfStrings--;*/
-            activePointForCycle++;
-            //Идем на новую итерацию
-            continue;
-        }
+			//Отдельно увеличивается размер вектора
+			sizeOfVect++;
+		}
 
-        //Если символов меньше трех (2 символа должны остаться, третий потом удалится)
-        if (arrayStrings[numbOfStrings].size() < 3)
-        {
-            std::cout << "Количество символов меньше минимального!" << std::endl;
-            exit(4);
-        }
+		//Изменяется размер вектора до 1
+		arrayStrings.resize(sizeOfVect);
 
-        //Размер строк не меньше 100
-        if (arrayStrings[numbOfStrings].size() > 100)
-        {
-            std::cout << "Слишком много символов в строке! \nМаксимальное число символов в строке - 100! " << std::endl;
-            exit(5);
-        }
+		//Извлекается строка из файла
+		//Возникает исключение при считывании пустой строки
+		std::getline(fin, arrayStrings[numbOfStrings]);
 
-        i++;
+		//Проверка на корректность строк (не пустая строка)
+		if (arrayStrings[numbOfStrings] == "")
+		{
+			//Убираем строку
 
-        if (activePointForCycle != 0)
-            activePointForCycle = 0;
+			//sizeOfVect--;
 
-    }
+			//numbOfStrings--;
 
-    //Максимальное число строк - 100
-    if (sizeOfVect > 100)
-    {
-        std::cout << "Слишком много строк! \nМаксимальное число строк - 100! " << std::endl;
-        exit(6);
-    }
+			activePointForCycle++;
+			//Идем на новую итерацию
+			continue;
+		}
 
-    //Если файл пустой, то программа вылетает с ошибкой
-    if (sizeOfVect == 0)
-    {
-        std::cout << "Файл пуст!" << std::endl;
-        exit(3);
-    }
+		//Если символов меньше трех (2 символа должны остаться, третий потом удалится)
+		if (arrayStrings[numbOfStrings].size() < 3)
+		{
+			try
+			{
+				fout.open(nameFileOutput);
+				fout << "Количество символов меньше минимального!";
+				exit(4);
+			}
+			catch (const std::exception& ex)
+			{
+				std::cout << ex.what() << std::endl;
+				if (nameFileOutput.find(".txt") == std::string::npos)
+				{
+					std::cout << "Неверно указано расширение файла. Файл должен иметь расширение .txt" << std::endl;
+					exit(1);
+				}
+				std::cout << "Ошибка открытия файла!" << std::endl;
+				exit(1);
+			}
+		}
 
-    //bool pointError;
+		//Размер строк не меньше 100
+		if (arrayStrings[numbOfStrings].size() > 100)
+		{
+			try
+			{
+				fout.open(nameFileOutput);
+				fout << "Слишком много символов в строке! \nМаксимальное число символов в строке - 100! ";
+				exit(5);
+			}
+			catch (const std::exception& ex)
+			{
+				std::cout << ex.what() << std::endl;
+				if (nameFileOutput.find(".txt") == std::string::npos)
+				{
+					std::cout << "Неверно указано расширение файла. Файл должен иметь расширение .txt" << std::endl;
+					exit(1);
+				}
+				std::cout << "Ошибка открытия файла!" << std::endl;
+				exit(1);
+			}
+		}
 
-    ////Вызывается функция, декодирующая строки
-    //for (int i = 0; i < numbOfStrings; i++)
-    //{
-    //    pointError = decodingStrings(arrayStrings[i]);
+		i++;
 
-    //    if (!pointError)
-    //    //Завершить выполнение программы, если последний символ строки неверен 
-    //        exit(15);
-    //}
+		if (activePointForCycle != 0)
+			activePointForCycle = 0;
 
-    if (arrayStrings[numbOfStrings] == "")
-    {
-        arrayStrings.resize(sizeOfVect - 1);
-        sizeOfVect--;
-        numbOfStrings--;
-    }
+	}
 
-    decodingAllStrings(arrayStrings);
+	//Максимальное число строк - 100
+	if (sizeOfVect > 100)
+	{
+		try
+		{
+			fout.open(nameFileOutput);
+			fout << "Слишком много строк! \nМаксимальное число строк - 100! ";
+			exit(6);
+		}
+		catch (const std::exception& ex)
+		{
+			std::cout << ex.what() << std::endl;
+			if (nameFileOutput.find(".txt") == std::string::npos)
+			{
+				std::cout << "Неверно указано расширение файла. Файл должен иметь расширение .txt" << std::endl;
+				exit(1);
+			}
+			std::cout << "Ошибка открытия файла!" << std::endl;
+			exit(1);
+		}
+	}
 
-    //Вызывается объект ofstream для перезаписи данных в файл 
-    std::ofstream fout;
+	//Если файл пустой, то программа вылетает с ошибкой
+	if (sizeOfVect == 1 && arrayStrings[0] == "")
+	{
+		try
+		{
+			fout.open(nameFileOutput);
+			fout <<	"Файл пуст!";
+			exit(3);
+		}
+		catch (const std::exception& ex)
+		{
+			std::cout << ex.what() << std::endl;
+			if (nameFileOutput.find(".txt") == std::string::npos)
+			{
+				std::cout << "Неверно указано расширение файла. Файл должен иметь расширение .txt" << std::endl;
+				exit(1);
+			}
+			std::cout << "Ошибка открытия файла!" << std::endl;
+			exit(1);
+		}
+	}
 
-    try
-    {
-        //Открываем файел
-        fout.open("decoderInputData.txt");
-    }
-    catch (const std::exception& ex)
-    {
-        std::cout << ex.what() << std::endl;
-        std::cout << "Ошибка открытия файла!" << std::endl;
-        exit(1);
-    }
+	//bool pointError;
 
-    //Хз как работает пока что 20:49
-    //Теперь понял 20:53
-    fout.clear();
+	////Вызывается функция, декодирующая строки
+	//for (int i = 0; i < numbOfStrings; i++)
+	//{
+	// pointError = decodingStrings(arrayStrings[i]);
 
-    //Отправляем полученные результаты в файл.
-    for (int i = 0; i < sizeOfVect; i++)
-    {
-        fout << arrayStrings[i] << "\n";
-    }
+	// if (!pointError)
+	// //Завершить выполнение программы, если последний символ строки неверен
+	// exit(15);
+	//}
 
-    fin.close();
-    fout.close();
+	if (arrayStrings[numbOfStrings] == "")
+	{
+		arrayStrings.resize(sizeOfVect - 1);
+		sizeOfVect--;
+		numbOfStrings--;
+	}
+
+	decodingAllStrings(arrayStrings, nameFileOutput);
+
+	try
+	{
+		//Открываем файел
+		fout.open(nameFileOutput);
+	}
+	catch (const std::exception& ex)
+	{
+		std::cout << ex.what() << std::endl;
+		if (nameFileOutput.find(".txt") == std::string::npos)
+		{
+			std::cout << "Неверно указано расширение файла. Файл должен иметь расширение .txt" << std::endl;
+			exit(1);
+		}
+		std::cout << "Ошибка открытия файла!" << std::endl;
+		exit(1);
+	}
+
+	//Хз как работает пока что 20:49
+	//Теперь понял 20:53
+	fout.clear();
+
+	//Отправляем полученные результаты в файл.
+	for (int i = 0; i < sizeOfVect; i++)
+	{
+		fout << arrayStrings[i] << "\n";
+	}
+
+	fin.close();
+	fout.close();
 }
 
-void decodingAllStrings(std::vector<std::string>& arrayStrings)
+
+void decodingAllStrings(std::vector<std::string>& arrayStrings, std::string& nameFileOutput)
 {
-    bool pointError;
+	std::ofstream fout;
 
-    //Вызывается функция, декодирующая строки
-    for (int i = 0; i < arrayStrings.size(); i++)
-    {
-        pointError = decodingStrings(arrayStrings[i]);
+	bool pointError;
 
-        if (!pointError)
-            //Завершить выполнение программы, если последний символ строки неверен 
-            exit(15);
-    }
+	//Вызывается функция, декодирующая строки
+	for (int i = 0; i < arrayStrings.size(); i++)
+	{
+		pointError = decodingStrings(arrayStrings[i]);
+
+		if (!pointError)
+			//Завершить выполнение программы, если последний символ строки неверен
+		{
+			try
+			{
+				fout.open(nameFileOutput);
+				fout << "Ошибка, строка " << i + 1 << " не заканчивается нужным символом!" << std::endl;
+				exit(15);
+			}
+			catch (const std::exception& ex)
+			{
+				std::cout << ex.what() << std::endl;
+				if (nameFileOutput.find(".txt") == std::string::npos)
+				{
+					std::cout << "Неверно указано расширение файла. Файл должен иметь расширение .txt" << std::endl;
+					exit(1);
+				}
+				std::cout << "Ошибка открытия файла!" << std::endl;
+				exit(1);
+			}
+		}
+
+
+	}
 }
 
 
 bool decodingStrings(std::string& arrayStrings)
 {
-    //Определить число символов в группе
-    int numbSymbolsInGroup = numbSymbolsGroups(arrayStrings);
+	//Определить число символов в группе
+	int numbSymbolsInGroup = numbSymbolsGroups(arrayStrings);
 
-    //Если строка не заканчивается прописной или строчной буквой латинского алфавита, то ошибка
-    if (numbSymbolsInGroup == 3456)
-    {
-        std::cout << "Ошибка, строка(-и) не заканчивается(-ются) нужным символом!" << std::endl;
-        return false;
-    }
+	//Если строка не заканчивается прописной или строчной буквой латинского алфавита, то ошибка
+	if (numbSymbolsInGroup == 3456)
+	{
+		return false;
+	}
 
-    //Удалить последний символ из строки
-    arrayStrings.erase(arrayStrings.size() - 1, 1);
+	//Удалить последний символ из строки
+	arrayStrings.erase(arrayStrings.size() - 1, 1);
 
-    // Определяет число групп
-    int numbGroups = arrayStrings.size() / numbSymbolsInGroup;
-    // Если есть остаток от деления, значит конечное число нужно округлить в большую сторону 
-    if (arrayStrings.size() % numbSymbolsInGroup != 0)
-        numbGroups += 1;
+	// Определяет число групп
+	int numbGroups = arrayStrings.size() / numbSymbolsInGroup;
+	// Если есть остаток от деления, значит конечное число нужно округлить в большую сторону
+	if (arrayStrings.size() % numbSymbolsInGroup != 0)
+		numbGroups += 1;
 
-    //Функция, принимающая строку и разбивающая в массив строк по группам и вовзаращющая в текущий двумерный массив строк
-    std::vector<std::string> groupsOfStrings = writeGroupsToArrayStrings(arrayStrings, numbSymbolsInGroup, numbGroups);
+	//Функция, принимающая строку и разбивающая в массив строк по группам и вовзаращющая в текущий двумерный массив строк
+	std::vector<std::string> groupsOfStrings = writeGroupsToArrayStrings(arrayStrings, numbSymbolsInGroup, numbGroups);
 
-    std::string endString = writeReverseGroups(groupsOfStrings);
+	std::string endString = writeReverseGroups(groupsOfStrings);
 
-    //сначала очистить массив от лишнего говна
-    arrayStrings.clear();
-    //arrayStrings = arrayStrings.replace(0, arrayStrings.size() - 1, endString);
-    arrayStrings = endString;
+	//сначала очистить массив от лишнего говна
+	arrayStrings.clear();
+	//arrayStrings = arrayStrings.replace(0, arrayStrings.size() - 1, endString);
+	arrayStrings = endString;
 
-    return true;
+	return true;
 }
 
 int numbSymbolsGroups(std::string& stringForDetermNumbGroups)
 {
-    //Определяет размер строки
-    int lenOfString = stringForDetermNumbGroups.size();
+	//Определяет размер строки
+	int lenOfString = stringForDetermNumbGroups.size();
 
-    //Определяет символ, определяющий число символов в одной группе
-    char lastSymb = stringForDetermNumbGroups[lenOfString - 1];
+	//Определяет символ, определяющий число символов в одной группе
+	char lastSymb = stringForDetermNumbGroups[lenOfString - 1];
 
-    //Проверяет, если последний символ - прописной, то сделать ее строчной 
-    if (lastSymb >= 65 && lastSymb <= 90) {
-        lastSymb += 32;
-    }
+	//Проверяет, если последний символ - прописной, то сделать ее строчной
+	if (lastSymb >= 65 && lastSymb <= 90) {
+		lastSymb += 32;
+	}
 
-    int numbSymbInGroups;
-    switch (lastSymb)
-    {
-    case 'a':
-        numbSymbInGroups = 2;
-        break;
-    case 'b':
-        numbSymbInGroups = 3;
-        break;
-    case 'c':
-        numbSymbInGroups = 4;
-        break;
-    case 'd':
-        numbSymbInGroups = 5;
-        break;
-    case 'e':
-        numbSymbInGroups = 6;
-        break;
-    case 'f':
-        numbSymbInGroups = 7;
-        break;
-    case 'g':
-        numbSymbInGroups = 8;
-        break;
-    case 'h':
-        numbSymbInGroups = 9;
-        break;
-    case 'i':
-        numbSymbInGroups = 10;
-        break;
-    case 'j':
-        numbSymbInGroups = 11;
-        break;
-    case 'k':
-        numbSymbInGroups = 12;
-        break;
-    case 'l':
-        numbSymbInGroups = 13;
-        break;
-    case 'm':
-        numbSymbInGroups = 14;
-        break;
-    case 'n':
-        numbSymbInGroups = 15;
-        break;
-    case 'o':
-        numbSymbInGroups = 16;
-        break;
-    case 'p':
-        numbSymbInGroups = 17;
-        break;
-    case 'q':
-        numbSymbInGroups = 18;
-        break;
-    case 'r':
-        numbSymbInGroups = 19;
-        break;
-    case 's':
-        numbSymbInGroups = 20;
-        break;
-    case 't':
-        numbSymbInGroups = 21;
-        break;
-    case 'u':
-        numbSymbInGroups = 22;
-        break;
-    case 'v':
-        numbSymbInGroups = 23;
-        break;
-    case 'w':
-        numbSymbInGroups = 24;
-        break;
-    case 'x':
-        numbSymbInGroups = 25;
-        break;
-    case 'y':
-        numbSymbInGroups = 26;
-        break;
-    case 'z':
-        numbSymbInGroups = 27;
-        break;
+	int numbSymbInGroups;
+	switch (lastSymb)
+	{
+	case 'a':
+		numbSymbInGroups = 2;
+		break;
+	case 'b':
+		numbSymbInGroups = 3;
+		break;
+	case 'c':
+		numbSymbInGroups = 4;
+		break;
+	case 'd':
+		numbSymbInGroups = 5;
+		break;
+	case 'e':
+		numbSymbInGroups = 6;
+		break;
+	case 'f':
+		numbSymbInGroups = 7;
+		break;
+	case 'g':
+		numbSymbInGroups = 8;
+		break;
+	case 'h':
+		numbSymbInGroups = 9;
+		break;
+	case 'i':
+		numbSymbInGroups = 10;
+		break;
+	case 'j':
+		numbSymbInGroups = 11;
+		break;
+	case 'k':
+		numbSymbInGroups = 12;
+		break;
+	case 'l':
+		numbSymbInGroups = 13;
+		break;
+	case 'm':
+		numbSymbInGroups = 14;
+		break;
+	case 'n':
+		numbSymbInGroups = 15;
+		break;
+	case 'o':
+		numbSymbInGroups = 16;
+		break;
+	case 'p':
+		numbSymbInGroups = 17;
+		break;
+	case 'q':
+		numbSymbInGroups = 18;
+		break;
+	case 'r':
+		numbSymbInGroups = 19;
+		break;
+	case 's':
+		numbSymbInGroups = 20;
+		break;
+	case 't':
+		numbSymbInGroups = 21;
+		break;
+	case 'u':
+		numbSymbInGroups = 22;
+		break;
+	case 'v':
+		numbSymbInGroups = 23;
+		break;
+	case 'w':
+		numbSymbInGroups = 24;
+		break;
+	case 'x':
+		numbSymbInGroups = 25;
+		break;
+	case 'y':
+		numbSymbInGroups = 26;
+		break;
+	case 'z':
+		numbSymbInGroups = 27;
+		break;
 
-    default:
-        numbSymbInGroups = 3456;
-        break;
-    }
+	default:
+		numbSymbInGroups = 3456;
+		break;
+	}
 
-    return numbSymbInGroups;
+	return numbSymbInGroups;
 }
 
 //ПРОВЕРИТЬ ЭТУ ФУНКЦИЮ В for
 std::vector<std::string> writeGroupsToArrayStrings(std::string& stringForReverseGroups, int numbSymbolsInGroup, int numbGroups)
 {
-    // Объявить массив строк
-    std::vector<std::string> arrayOfStringsForReverse(numbGroups);
+	// Объявить массив строк
+	std::vector<std::string> arrayOfStringsForReverse(numbGroups);
 
-    //Заполнить массив строк группами исходной строки
-    for (int i = 0, j = 0; i < stringForReverseGroups.size(); i += numbSymbolsInGroup, j++)
-    {
-        arrayOfStringsForReverse.at(j) = stringForReverseGroups.substr(i, numbSymbolsInGroup);
-    }
+	//Заполнить массив строк группами исходной строки
+	for (int i = 0, j = 0; i < stringForReverseGroups.size(); i += numbSymbolsInGroup, j++)
+	{
+		arrayOfStringsForReverse.at(j) = stringForReverseGroups.substr(i, numbSymbolsInGroup);
+	}
 
-    return arrayOfStringsForReverse;
+	return arrayOfStringsForReverse;
 }
 
 std::string writeReverseGroups(std::vector<std::string>& groupsOfStrings)
 {
-    int numbGroups = groupsOfStrings.size();
-    //Объявляем вектор, в который запишем обратные строки
-    std::vector<std::string> reversedStrings(numbGroups);
+	int numbGroups = groupsOfStrings.size();
+	//Объявляем вектор, в который запишем обратные строки
+	std::vector<std::string> reversedStrings(numbGroups);
 
-    //Присводить каждой строке нового вектора строку старого вектора с конца.
-    // (Берем numbGroups - 1, чтобы обратиться правильно по индексу и вычитаем число i
-    for (int i = 0; i < numbGroups; i++)
-        reversedStrings[i] = groupsOfStrings[numbGroups - 1 - i];
+	//Присводить каждой строке нового вектора строку старого вектора с конца.
+	// (Берем numbGroups - 1, чтобы обратиться правильно по индексу и вычитаем число i
+	for (int i = 0; i < numbGroups; i++)
+		reversedStrings[i] = groupsOfStrings[numbGroups - 1 - i];
 
-    //Объявляем строку, которая будет иметь конечный вид строки
-    std::string endString;
+	//Объявляем строку, которая будет иметь конечный вид строки
+	std::string endString;
 
-    // Каждую группу конкатанируем к строке
-    for (int i = 0; i < numbGroups; i++)
-    {
-        if (i == 0)
-        {
-            endString = reversedStrings[i];
-            continue;
-        }
+	// Каждую группу конкатанируем к строке
+	for (int i = 0; i < numbGroups; i++)
+	{
+		if (i == 0)
+		{
+			endString = reversedStrings[i];
+			continue;
+		}
 
-        endString += reversedStrings[i];
-    }
+		endString += reversedStrings[i];
+	}
 
-    //Вернем строку
-    return endString;
+	//Вернем строку
+	return endString;
 }

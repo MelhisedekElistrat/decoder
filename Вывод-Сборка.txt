@@ -1,0 +1,10 @@
+﻿Сборка начата…
+1>------ Сборка начата: проект: writeGroupsToArrayStringsTest, Конфигурация: Debug Win32 ------
+2>------ Сборка начата: проект: writeReverseGroupsTest, Конфигурация: Debug Win32 ------
+1>writeGroupsToArrayStringsTest.cpp
+2>writeReverseGroupsTest.cpp
+1>   Создается библиотека C:\Users\Никита\source\repos\decoder\Debug\writeGroupsToArrayStringsTest.lib и объект C:\Users\Никита\source\repos\decoder\Debug\writeGroupsToArrayStringsTest.exp
+2>   Создается библиотека C:\Users\Никита\source\repos\decoder\Debug\writeReverseGroupsTest.lib и объект C:\Users\Никита\source\repos\decoder\Debug\writeReverseGroupsTest.exp
+1>writeGroupsToArrayStringsTest.vcxproj -> C:\Users\Никита\source\repos\decoder\Debug\writeGroupsToArrayStringsTest.dll
+2>writeReverseGroupsTest.vcxproj -> C:\Users\Никита\source\repos\decoder\Debug\writeReverseGroupsTest.dll
+========== Сборка: успешно: 2, с ошибками: 0, без изменений: 4, пропущено: 0 ==========

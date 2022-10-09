@@ -43,6 +43,8 @@ int main()
     }
 
    
+    //Отключаем генерацию всех исключений
+    fin.exceptions(std::ifstream::goodbit);
 
     //Размер вектора 
     int sizeOfVect = 1;
